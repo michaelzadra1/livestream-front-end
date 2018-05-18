@@ -1,0 +1,27 @@
+<mat-spinner [diameter]="40" *ngIf="loading === true"></mat-spinner>
+<div *ngIf="loading === false && stream" class="section-container">
+  <!-- Youtube Iframe-->
+  <div class="row justify-content-center">
+    <div class="col-12 align-self-center stream-view">
+      <h2 style="margin-bottom: 20px">{{ stream['stream_title'] }}</h2>
+      <iframe width="560" height="349" [src]='iframeUrl' frameborder="0" allowfullscreen></iframe>
+    </div>
+  </div>
+  <!-- Chat Interface-->
+  <div class="row justify-content-center">
+    <div class="col-12 align-self-center chat-interface">
+      <h5 *ngIf="!chat || chat.length === 0">Chats not available for this live stream</h5>
+      <div *ngIf="chat">
+        <div class="row justify-content-center chat-message" *ngFor="let chatMessage of chatMessages">
+          <div class="col-3">
+            <span><b>{{ chatMessage['authorDetails']['displayName'] }}</b></span>
+          </div>
+          <div class="col-9">
+            <span>{{ chatMessage['snippet']['textMessageDetails']['messageText'] }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
