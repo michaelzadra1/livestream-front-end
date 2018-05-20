@@ -1,22 +1,25 @@
-import { Injectable, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { Headers, RequestOptions } from "@angular/http";
+import { Injectable } from '@angular/core';
+import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs/Observable";
-import { IntervalObservable } from 'rxjs/observable/IntervalObservable';
 
 import "rxjs/add/operator/catch";
 import 'rxjs/add/observable/throw';
-import 'rxjs/add/operator/mergeMap';
 
 @Injectable()
 export class StreamsService {
   endpoint = 'https://livestream-backend-zadra.herokuapp.com/';
-
+  // endpoint = 'http://localhost:8000';
   constructor(
     private http: HttpClient
   ) {
   }
 
+  login(authToken) {
+    return this.http.post(`${this.endpoint}/login/`, authToken)
+    .catch((error: any) =>
+      Observable.throw(error)
+    );
+  }
   // return list of live streams
   getStreams() {
     return this.http.get(`${this.endpoint}/stream/`)
@@ -33,10 +36,14 @@ export class StreamsService {
   }
   // refresh chat
   refreshChat(refreshChat) {
-    console.log(refreshChat);
-    return IntervalObservable.create(5000).flatMap(
-      () => this.http.post(`${this.endpoint}/refreshChat/`, refreshChat)
-    )
+    return this.http.post(`${this.endpoint}/refreshChat/`, refreshChat)
+    .catch((error: any) =>
+      Observable.throw(error)
+    );
+  }
+  // get chat messages from user
+  getUserMessages(userId) {
+    return this.http.post(`${this.endpoint}/user/`, userId)
     .catch((error: any) =>
       Observable.throw(error)
     );

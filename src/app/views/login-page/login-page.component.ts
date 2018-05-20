@@ -1,7 +1,5 @@
-import { Component } from '@angular/core';
-import { StreamsService } from '../../services/streams.service';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
 import { AuthService, GoogleLoginProvider } from "angularx-social-login";
 import { Router } from '@angular/router';
 
@@ -9,22 +7,27 @@ import { Router } from '@angular/router';
   selector: 'app-login-page',
   templateUrl: './login-page.component.html'
 })
-export class LoginPageComponent {
+export class LoginPageComponent implements OnInit {
   loading = false;
-  token: string;
 
   constructor(
-    private streamsService: StreamsService,
     private http: HttpClient,
     private authService: AuthService,
     private router: Router
-  ) { }
+  ) {
+  }
 
-
+  ngOnInit() {
+    this.authService.authState.subscribe((user) => {
+      if (user != null) {
+        this.router.navigate(['/streams']);
+      }
+      this.loading = false;
+    });
+  }
   oauthLogin() {
     this.authService.signIn(GoogleLoginProvider.PROVIDER_ID).then(
       (userData) => {
-        // sessionStorage.setItem('authToken', userData.authToken);
         this.router.navigate(['/streams']);
       },
       (error) => {

@@ -1,4 +1,5 @@
-<div style="margin-top: 20px;" class="login">
+<mat-spinner [diameter]="40" *ngIf="loading === true"></mat-spinner>
+<div *ngIf="user == null" style="margin-top: 20px;" class="login">
   <h3>Login</h3>
   <form>
     <button mat-raised-button (click) = "oauthLogin()">Login with Google</button>

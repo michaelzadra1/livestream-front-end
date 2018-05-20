@@ -1,4 +1,17 @@
 <div class="site-wrapper">
-  <h1>LoFi Music YouTube Streams</h1>
+  <header>
+    <div class="row justify-content-start">
+      <div class="col-6 align-self-center">
+        <h2>LoFi Music YouTube Streams</h2>
+      </div>
+      <div class="col-4 user-display align-self-center" *ngIf="loggedIn">
+        <a [routerLink]="['/streams']">
+          <img class="rounded-circle img-fluid" src="{{ user.photoUrl }}">
+          <h4>Welcome {{ user.name }}</h4>
+        </a>
+      </div>
+      <div class="col-2"></div>
+    </div>
+  </header>
   <router-outlet></router-outlet>
 </div>

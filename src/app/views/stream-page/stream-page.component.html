@@ -1,26 +1,43 @@
 <mat-spinner [diameter]="40" *ngIf="loading === true"></mat-spinner>
+<div *ngIf = "streamError === true">
+    <h5>Error retreiving Stream</h5>
+</div>
 <div *ngIf="loading === false && stream" class="section-container">
   <!-- Youtube Iframe-->
   <div class="row justify-content-center">
     <div class="col-12 align-self-center stream-view">
-      <h2 style="margin-bottom: 20px">{{ stream['stream_title'] }}</h2>
+      <h2 style="margin-bottom: 20px">{{ stream.stream_title }}</h2>
       <iframe width="560" height="349" [src]='iframeUrl' frameborder="0" allowfullscreen></iframe>
     </div>
   </div>
-  <!-- Chat Interface-->
+  <!-- Chat-->
   <div class="row justify-content-center">
     <div class="col-12 align-self-center chat-interface">
       <h5 *ngIf="!chat || chat.length === 0">Chats not available for this live stream</h5>
       <div *ngIf="chat">
+        <!-- Chat Interface-->
         <div class="row justify-content-center chat-message" *ngFor="let chatMessage of chatMessages">
           <div class="col-3">
-            <span><b>{{ chatMessage['authorDetails']['displayName'] }}</b></span>
+            <span>
+              <b>
+                <a [routerLink]="['/user', chatMessage['authorDetails']['channelId']]">
+                  {{ chatMessage.authorDetails?.displayName }}
+                </a>
+              </b>
+            </span>
           </div>
           <div class="col-9">
-            <span>{{ chatMessage['snippet']['textMessageDetails']['messageText'] }}</span>
+            <span>{{ chatMessage.snippet.textMessageDetails?.messageText }}</span>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-12 align-self-center hype-bar-interface">
+      <h4>Chat Hype</h4>
+      <mat-progress-bar mode="buffer" [value]="hypeValue" buffer="0"></mat-progress-bar>
+      <h5 *ngIf = "messageRate !== null">{{ messageRate }} messages per second</h5>
     </div>
   </div>
 

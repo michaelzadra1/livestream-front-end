@@ -9,21 +9,20 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class StreamPageComponent implements OnInit, OnDestroy {
   loading = false;
+  streamError = false;
+
   sub: any;
   videoId;
   chat: any;
   chatMessages: any;
   stream: any;
-  url;
   iframeUrl: any;
 
-  chatToken: any;
   refreshChat = {};
-  subscribeChat: any;
   newMessages: any;
-
-
-  pollingInterval: any;
+  messageRate: number = null;
+  messagePollInterval: any;
+  hypeValue: number;
 
   constructor(
     private streamsService: StreamsService,
@@ -32,8 +31,8 @@ export class StreamPageComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnDestroy() {
-    if (this.subscribeChat) {
-      this.subscribeChat.unsubscribe();
+    if (this.messagePollInterval) {
+      clearInterval(this.messagePollInterval);
     }
   }
   ngOnInit() {
@@ -48,17 +47,21 @@ export class StreamPageComponent implements OnInit, OnDestroy {
     this.streamsService.getStream(this.videoId).subscribe(
       (response) => {
         this.loading = false;
-        this.stream = response.stream_details;
-
-        if (!this.iframeUrl) {
-          this.url = `https://www.youtube.com/embed/live_stream?channel=${response.stream_details['channel_id']}`;
-          this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
-        }
-
-        this.chat = response.chat;
-        if (this.chat) {
+        if (response) { // ensure no error in reteiving livestream
+          this.stream = response.stream_details;
+          if (!this.iframeUrl) {
+            this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/live_stream?channel=${response.stream_details['channel_id']}`);
+          }
           this.chat = response.chat;
-          this.chatMessages = this.chat['items'];
+          if (this.chat) {
+            this.chat = response.chat;
+            this.chatMessages = this.chat['items'];
+            this.refreshChat['chatToken'] = this.chat['nextPageToken'];
+            this.refreshChat['pollingIntervalMillis'] = this.chat['pollingIntervalMillis'];
+            this.refreshChat['chatId'] = this.stream['chat_id'];
+          }
+        } else {
+          this.streamError = true;
         }
       },
       (error) => {
@@ -67,8 +70,6 @@ export class StreamPageComponent implements OnInit, OnDestroy {
       () => {
         // Start polling chat if chat object recieved for stream
         if (this.chat) {
-          this.refreshChat['chatToken'] = this.chat['nextPageToken'];
-          this.refreshChat['chatId'] = this.stream['chat_id'];
           this.pollChat();
         }
       }
@@ -76,12 +77,23 @@ export class StreamPageComponent implements OnInit, OnDestroy {
 
   }
   pollChat() {
-    this.subscribeChat = this.streamsService.refreshChat(this.refreshChat).subscribe(
-      (response) => {
-        this.newMessages = response['items'];
-        this.chatMessages = this.chatMessages.concat(this.newMessages);
-        console.log(this.newMessages);
-      },
-    );
+    // Poll the refresh chat endpoint based on polling interval returned by YouTube API
+    this.messagePollInterval = setInterval( () => {
+      this.streamsService.refreshChat(this.refreshChat).subscribe(
+        (response) => {
+          this.refreshChat['chatToken'] = response['nextPageToken'];
+          this.refreshChat['pollingIntervalMillis'] = response['pollingIntervalMillis'];
+          this.newMessages = response['items'];
+          this.chatMessages = this.chatMessages.concat(this.newMessages);
+          this.updateHype();
+        },
+      );
+    }, this.refreshChat['pollingIntervalMillis']);
+  }
+  updateHype() {
+    this.messageRate = ( (this.newMessages.length) / (this.refreshChat['pollingIntervalMillis'] / 1000) );
+    this.messageRate = Math.round(this.messageRate * 100) / 100; // round to 2 decimal places
+    console.log(this.messageRate);
+    this.hypeValue = (this.messageRate / 2) * 100;
   }
 }

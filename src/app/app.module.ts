@@ -5,7 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { MatInputModule,
          MatProgressSpinnerModule,
-         MatButtonModule
+         MatButtonModule,
+         MatProgressBarModule
         } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -16,6 +17,7 @@ import { StreamPageComponent } from './views/stream-page/stream-page.component';
 
 import { SocialLoginModule, AuthServiceConfig, AuthService } from "angularx-social-login";
 import { GoogleLoginProvider } from "angularx-social-login";
+import { UserPageComponent } from './views/user-page/user-page.component';
 
 let config = new AuthServiceConfig([
   {
@@ -33,6 +35,7 @@ const routes = [
   { path: '', component: LoginPageComponent },
   { path: 'streams', component: StreamsPageComponent },
   { path: 'stream/:videoId', component: StreamPageComponent },
+  { path: 'user/:userId', component: UserPageComponent },
 ];
 
 @NgModule({
@@ -41,15 +44,14 @@ const routes = [
     LoginPageComponent,
     StreamsPageComponent,
     StreamPageComponent,
+    UserPageComponent,
   ],
   imports: [
     BrowserModule,
     RouterModule.forRoot(routes),
     FormsModule,
     HttpClientModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
-    MatButtonModule
+    MatInputModule, MatProgressSpinnerModule, MatButtonModule, MatProgressBarModule, MatProgressBarModule
   ],
   providers: [
     StreamsService,

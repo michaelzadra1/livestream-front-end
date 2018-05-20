@@ -1,0 +1,20 @@
+<mat-spinner [diameter]="40" *ngIf="loading === true"></mat-spinner>
+<div *ngIf="loading === false && userMessages" class="section-container">
+  <h3 style="margin-bottom: 20px">Chat messages sent by channel ID: {{ userId }}</h3>
+
+  <div class="row justify-content-center">
+    <div class="col-12 align-self-center user-chat-interface">
+      <h5 *ngIf="!userMessages || userMessages.length === 0">Chats not available for this user or no chats loaded yet</h5>
+      <div class="row justify-content-center chat-message" *ngFor="let message of userMessages">
+        <div class="col-3">
+          <span>
+            <b>{{ message['message_username'] }}</b>
+          </span>
+        </div>
+        <div class="col-9">
+          <span>{{ message['message_text'] }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
