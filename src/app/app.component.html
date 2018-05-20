@@ -10,7 +10,9 @@
           <h4>Welcome {{ user.name }}</h4>
         </a>
       </div>
-      <div class="col-2"></div>
+      <div class="col-2">
+          <button *ngIf = "user != null" mat-raised-button (click) = "logout()">Logout</button>
+      </div>
     </div>
   </header>
   <router-outlet></router-outlet>
