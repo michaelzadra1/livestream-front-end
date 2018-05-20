@@ -18,8 +18,10 @@ export class LoginPageComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loading = true;
     this.authService.authState.subscribe((user) => {
       if (user != null) {
+        this.loading = false;
         this.router.navigate(['/streams']);
       }
       this.loading = false;
